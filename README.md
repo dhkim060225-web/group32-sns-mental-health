@@ -15,7 +15,8 @@ A data story website (Option 4) testing the conventional wisdom that more social
 | `results.json` | All computed results |
 | `data/Students_Social_Media_Addiction.csv` | Raw data (Kaggle, 705 rows, 13 variables) |
 | `executive-summary.pdf`, `technical-documentation.pdf` | 1-page summary and 2-page technical documentation |
-| `tools/` | Rebuild `index.html` (`build_page.py`) and the two PDFs (`build_docs.py`) |
+| `three-system-maps-report.pdf` | Map A, B, C comparison and justification document (2 pages) |
+| `tools/` | Rebuild `index.html` (`build_page.py`) and the two PDFs (`build_docs.py`, `build_maps_report.py`) |
 
 ## Reproduce
 ```bash

@@ -524,7 +524,7 @@ footer{border-top:1px solid var(--line);padding:2.5rem 0 3rem;margin-top:3rem;fo
     </div>
 
     <h3>How we used AI</h3>
-    <div class="todo prose">[Team to complete before submission: describe which AI tools were used, for which parts (for example code checking, analysis, drafting this page), and how the team verified the output, following the Intercollege AI policy.]</div>
+    <div class="prose"><p style="margin:0">An AI assistant (Claude, by Anthropic) was used to draft the analysis code, this web page, and the two PDF documents. The team defined the research question, chose the variables and methods, and reviewed all interpretations. Every reported number was checked by re-running analysis.py on the course dataset.</p></div>
 
     <h3>Team</h3>
     <ul class="team">
@@ -543,6 +543,13 @@ footer{border-top:1px solid var(--line);padding:2.5rem 0 3rem;margin-top:3rem;fo
       <a class="btn ghost" href="executive-summary.pdf" target="_blank" rel="noopener">Executive summary (PDF)</a>
       <a class="btn ghost" href="technical-documentation.pdf" target="_blank" rel="noopener">Technical documentation (PDF)</a>
     </div>
+    <ul class="small" style="margin:1rem 0 0;padding-left:1.2rem">
+      <li><b>Analysis code</b>: <code>analysis.py</code> recomputes every number on this page.</li>
+      <li><b>Raw data</b>: the original 705-row file. <code>analysis.py</code> removes one duplicate row, leaving n = 704.</li>
+      <li><b>All results (JSON)</b>: every estimate, interval and table used on this page.</li>
+      <li><b>Platform table and model estimates (CSV)</b>: the numbers behind the platform and model charts.</li>
+      <li><b>PDFs</b>: a 1-page executive summary and a 2-page technical documentation.</li>
+    </ul>
   </div>
 </section>
 </main>

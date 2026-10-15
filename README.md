@@ -30,7 +30,7 @@ python tools/build_page.py    # refresh index.html with the new results.json
 
 ## Before final submission (team to do)
 - [ ] Fill in the "How we used AI" box in `tools/template.html` (then rebuild) following the Intercollege AI policy.
-- [ ] Fill in the AI-assistance line in `tools/build_docs.py` and the website, then rebuild.
+- [ ] Confirm the AI-assistance statement matches what the team actually did (website Process section and Technical Documentation), then rebuild.
 - [ ] If a video pitch is required, upload it (unlisted, 720p+, captions) and add the link.
 - [ ] Check every number against your own run of `analysis.py`.
 

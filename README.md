@@ -1,4 +1,7 @@
 # Does scrolling more mean feeling worse?
+
+Website: https://dhkim060225-web.github.io/group32-sns-mental-health/  
+Repository: https://github.com/dhkim060225-web/group32-sns-mental-health
 **GROUP32 · ACDT 2026 Semester 2 · Project 1: Revisit "Tackling the Conventional Wisdom"**
 
 A data story website (Option 4) testing the conventional wisdom that more social media use means poorer student mental health.
@@ -28,7 +31,6 @@ python tools/build_page.py    # refresh index.html with the new results.json
 ## Before final submission (team to do)
 - [ ] Fill in the "How we used AI" box in `tools/template.html` (then rebuild) following the Intercollege AI policy.
 - [ ] Fill in the AI-assistance line in `tools/build_docs.py` and the website, then rebuild.
-- [ ] Replace [GitHub Pages URL] and [GitHub repository URL] in both PDFs (`tools/build_docs.py`).
 - [ ] If a video pitch is required, upload it (unlisted, 720p+, captions) and add the link.
 - [ ] Check every number against your own run of `analysis.py`.
 

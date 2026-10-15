@@ -2,6 +2,7 @@
 
 Website: https://dhkim060225-web.github.io/group32-sns-mental-health/  
 Repository: https://github.com/dhkim060225-web/group32-sns-mental-health
+
 **GROUP32 · ACDT 2026 Semester 2 · Project 1: Revisit "Tackling the Conventional Wisdom"**
 
 A data story website (Option 4) testing the conventional wisdom that more social media use means poorer student mental health.

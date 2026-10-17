@@ -308,6 +308,38 @@ fq = abs(t1) / np.sqrt(m["dof"])
 rv = lambda q: 0.5 * (np.sqrt((q * fq) ** 4 + 4 * (q * fq) ** 2) - (q * fq) ** 2)
 OUT["sensitivity"] = {"partial_f": float(fq), "rv_zero": float(rv(1.0)), "rv_half": float(rv(0.5))}
 
+# ------------------------------------------------------------------ 13. Platform slopes among students from the same country
+# Within each platform, compare students from the same country (country-demeaned x and y).
+# A platform whose users all give one score per country (WhatsApp) or never share a country (LinkedIn) cannot be identified this way.
+parts = {}
+for p_ in OUT["platforms"]:
+    if p_["n"] < 20:
+        p_["within_slope"], p_["within_identified"] = None, None
+        continue
+    d = df[df.Most_Used_Platform == p_["platform"]]
+    xx = d[X].values; yy = d[Y].values.astype(float); cc = d.Country.values
+    xt_ = xx - pd.Series(xx).groupby(cc).transform("mean").values
+    yt_ = yy - pd.Series(yy).groupby(cc).transform("mean").values
+    sxx_, syy_ = float((xt_ ** 2).sum()), float((yt_ ** 2).sum())
+    ok_ = sxx_ > 1e-9 and syy_ > 1e-9
+    p_["within_identified"] = bool(ok_)
+    p_["within_slope"] = float((xt_ * yt_).sum() / sxx_) if sxx_ > 1e-9 else None
+    p_["n_countries"] = int(len(set(cc)))
+    if ok_:
+        parts[p_["platform"]] = (xt_, yt_, len(set(cc)))
+P_ = len(parts); N_ = sum(len(v[0]) for v in parts.values()); cells_ = sum(v[2] for v in parts.values())
+sxx_all = sum((v[0] ** 2).sum() for v in parts.values()); sxy_all = sum((v[0] * v[1]).sum() for v in parts.values())
+bc_ = sxy_all / sxx_all
+rss_c = sum(((v[1] - bc_ * v[0]) ** 2).sum() for v in parts.values())
+rss_s = sum(((v[1] - ((v[0] * v[1]).sum() / (v[0] ** 2).sum()) * v[0]) ** 2).sum() for v in parts.values())
+df1_, df2_ = P_ - 1, N_ - cells_ - P_
+F_ = ((rss_c - rss_s) / df1_) / (rss_s / df2_)
+OUT["heterogeneity"]["platform_within"] = {"F": float(F_), "df1": int(df1_), "df2": int(df2_), "p": float(stats.f.sf(F_, df1_, df2_)),
+                                           "platforms": list(parts), "common_slope": float(bc_), "n": int(N_)}
+wa_ = [p_ for p_ in OUT["platforms"] if p_["platform"] == "WhatsApp"][0]
+OUT["whatsapp"] = {"n": wa_["n"], "countries": wa_.get("n_countries"), "usage_min": float(df[df.Most_Used_Platform == "WhatsApp"][X].min()),
+                   "usage_max": float(df[df.Most_Used_Platform == "WhatsApp"][X].max())}
+
 # ------------------------------------------------------------------ 11. Points for the scatter plot
 plats = [p["platform"] for p in OUT["platforms"]]
 levels = ["High School", "Undergraduate", "Graduate"]

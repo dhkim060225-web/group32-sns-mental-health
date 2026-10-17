@@ -260,6 +260,54 @@ for col, vals in [("Academic_Level", ["Undergraduate", "Graduate", "High School"
         OUT["dml"]["groups"].append(r)
         print(col, v, round(r["theta"], 3), flush=True)
 
+# ------------------------------------------------------------------ 12. Extra checks (peer-review follow-up)
+# How many countries contribute a single student?
+vc = df.Country.value_counts()
+multi = vc[vc >= 2].index
+OUT["countries"] = {"n_single": int((vc == 1).sum()), "share_single": float((vc == 1).mean()),
+                    "n_multi": int(len(multi)), "n_students_multi": int(df.Country.isin(multi).sum())}
+
+# Within-country slope (country fixed effects) with its own country-clustered SE
+g_ = df.Country.values
+xt = x - pd.Series(x).groupby(g_).transform("mean").values
+yt = y - pd.Series(y).groupby(g_).transform("mean").values
+bw = (xt * yt).sum() / (xt ** 2).sum(); uw = yt - bw * xt
+G_ = len(np.unique(g_)); K_ = G_ + 1
+meat_w = sum((xt[g_ == c] * uw[g_ == c]).sum() ** 2 for c in np.unique(g_))
+se_w = float(np.sqrt(meat_w / (xt ** 2).sum() ** 2 * (G_ / (G_ - 1)) * ((n - 1) / (n - K_))))
+OUT["within_country"] = {"slope": bw, "se_cluster": se_w, "ci_cluster": [bw - 1.96 * se_w, bw + 1.96 * se_w]}
+
+# Adjusted R-squared: hours alone, country alone, both
+OUT["r2_adjusted"] = {"hours": 1 - (1 - m["r2"]) * (n - 1) / (n - 2), "country": r2_adj,
+                      "hours_country": 1 - (1 - m_uc["r2"]) * (n - 1) / (n - (Dc.shape[1] + 2))}
+
+# Prediction on held-out countries: 200 repeats of 5-fold splits by country
+rng2 = np.random.default_rng(0); ctry_ = df.Country.unique(); lco = []
+for i in range(200):
+    perm = rng2.permutation(ctry_); fold = {c: k % 5 for k, c in enumerate(perm)}
+    gg = df.Country.map(fold).values; pred = np.zeros(n)
+    for k in range(5):
+        tr_, te_ = gg != k, gg == k
+        pred[te_] = LinearRegression().fit(df.loc[tr_, [X]], y[tr_]).predict(df.loc[te_, [X]])
+    lco.append((r2_score(y, pred), mean_squared_error(y, pred) ** 0.5))
+lco = np.array(lco)
+OUT["split_country"] = {"r2_mean": float(lco[:, 0].mean()), "r2_min": float(lco[:, 0].min()),
+                        "r2_max": float(lco[:, 0].max()), "rmse_mean": float(lco[:, 1].mean())}
+
+# Ordinal outcome check: rank correlation
+rho, prho = stats.spearmanr(df[X], df[Y])
+OUT["spearman"] = {"rho": float(rho), "p": float(prho), "pearson": float(np.corrcoef(df[X], df[Y])[0, 1])}
+
+# Multiple testing: Bonferroni across the per-platform slope tests
+pp = [p_["p"] for p_ in OUT["platforms"] if p_.get("p") is not None]
+OUT["bonferroni"] = {"m": len(pp), "alpha": 0.05 / len(pp), "max_p": float(max(pp)),
+                     "all_reject": bool(all(v < 0.05 / len(pp) for v in pp))}
+
+# Sensitivity to an unmeasured confounder: robustness value (Cinelli & Hazlett, 2020), simple regression
+fq = abs(t1) / np.sqrt(m["dof"])
+rv = lambda q: 0.5 * (np.sqrt((q * fq) ** 4 + 4 * (q * fq) ** 2) - (q * fq) ** 2)
+OUT["sensitivity"] = {"partial_f": float(fq), "rv_zero": float(rv(1.0)), "rv_half": float(rv(0.5))}
+
 # ------------------------------------------------------------------ 11. Points for the scatter plot
 plats = [p["platform"] for p in OUT["platforms"]]
 levels = ["High School", "Undergraduate", "Graduate"]
